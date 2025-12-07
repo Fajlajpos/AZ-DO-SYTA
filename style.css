@@ -717,6 +717,8 @@ a {
 }
 
 /* ===== Responsive Design ===== */
+
+/* Tablet and smaller desktops */
 @media (max-width: 968px) {
     .nav-menu {
         position: fixed;
@@ -729,6 +731,7 @@ a {
         gap: 1.5rem;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         transition: var(--transition);
+        z-index: 999;
     }
 
     .nav-menu.active {
@@ -742,20 +745,80 @@ a {
     .about-content,
     .reservation-content {
         grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .menu-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-title {
+        font-size: clamp(2.5rem, 6vw, 4rem);
+    }
+
+    .hero-subtitle {
+        font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    }
+}
+
+/* Mobile landscape */
+@media (max-width: 768px) {
+    .container {
+        padding: 3rem 2rem;
     }
 
     .menu-grid {
         grid-template-columns: 1fr;
     }
 
-    .form-row {
-        grid-template-columns: 1fr;
+    .about-image {
+        order: -1;
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+    }
+
+    .cta-button {
+        padding: 1rem 2.5rem;
+        font-size: 1rem;
+    }
+
+    .scroll-indicator {
+        display: none;
+    }
+
+    /* Mobile-friendly menu items */
+    .menu-item {
+        padding: 1rem;
+    }
+
+    .menu-image {
+        height: 250px;
+    }
+
+    /* Larger touch targets for mobile */
+    .nav-link {
+        padding: 1rem;
+        font-size: 1.1rem;
+    }
+
+    .back-to-top {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
     }
 }
 
+/* Mobile portrait */
 @media (max-width: 640px) {
     .container {
-        padding: 3rem 1.5rem;
+        padding: 2.5rem 1.5rem;
     }
 
     .nav-container {
@@ -763,18 +826,184 @@ a {
     }
 
     .logo-main {
-        font-size: 1.4rem;
+        font-size: 1.3rem;
+    }
+
+    .logo-tagline {
+        font-size: 0.65rem;
     }
 
     .hero-content {
         padding: 1rem;
     }
 
+    .hero-title {
+        font-size: 2.2rem;
+        margin-bottom: 1rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.1rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .hero-description {
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+    }
+
     .section-header {
-        margin-bottom: 2.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        font-size: 2rem;
+    }
+
+    .section-subtitle {
+        font-size: 1rem;
+    }
+
+    .about-block h3 {
+        font-size: 1.3rem;
+    }
+
+    .about-block p {
+        font-size: 0.95rem;
+    }
+
+    .menu-info h3 {
+        font-size: 1.3rem;
+    }
+
+    .menu-info p {
+        font-size: 0.9rem;
+    }
+
+    .price {
+        font-size: 1.3rem;
     }
 
     .reservation-form-wrapper {
         padding: 2rem 1.5rem;
+    }
+
+    .info-card {
+        padding: 1.5rem;
+    }
+
+    .submit-button {
+        padding: 1rem;
+        font-size: 1rem;
+    }
+
+    /* Stack navigation menu items */
+    .nav-menu {
+        top: 70px;
+        padding: 1.5rem;
+    }
+
+    /* Adjust image card for mobile */
+    .image-card {
+        padding: 0.8rem;
+    }
+
+    /* Mobile menu overlay */
+    .menu-overlay {
+        opacity: 1;
+    }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+    .container {
+        padding: 2rem 1rem;
+    }
+
+    .nav-container {
+        padding: 0.8rem 1rem;
+    }
+
+    .logo-main {
+        font-size: 1.1rem;
+    }
+
+    .logo-tagline {
+        font-size: 0.6rem;
+    }
+
+    .hero-title {
+        font-size: 1.8rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+
+    .hero-description {
+        font-size: 0.85rem;
+    }
+
+    .cta-button {
+        padding: 0.9rem 2rem;
+        font-size: 0.95rem;
+    }
+
+    .section-title {
+        font-size: 1.7rem;
+    }
+
+    .menu-image {
+        height: 200px;
+    }
+
+    .about-block h3 {
+        font-size: 1.2rem;
+    }
+
+    .form-group label {
+        font-size: 0.9rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        font-size: 0.95rem;
+        padding: 0.8rem;
+    }
+
+    .back-to-top {
+        width: 45px;
+        height: 45px;
+        bottom: 1rem;
+        right: 1rem;
+    }
+
+    /* Reduce parallax on very small screens for performance */
+    .hero-section {
+        background-attachment: scroll;
+    }
+}
+
+/* Extra small devices - optimize for performance */
+@media (max-width: 375px) {
+    .hero-title {
+        font-size: 1.6rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+    }
+
+    .menu-info h3 {
+        font-size: 1.1rem;
+    }
+
+    .price {
+        font-size: 1.2rem;
+    }
+
+    .info-card h3 {
+        font-size: 1.1rem;
     }
 }
