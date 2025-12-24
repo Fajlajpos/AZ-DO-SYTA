@@ -59,32 +59,7 @@ document.querySelector('.cta-button')?.addEventListener('click', function (e) {
     }
 });
 
-// ===== Performance Optimized Active Navigation Link (IntersectionObserver) =====
-const navLinks = document.querySelectorAll('.nav-link');
-const sectionObserverOptions = {
-    threshold: 0.3,
-    rootMargin: "-100px 0px -50% 0px" // Trigger when section is near top/center
-};
-
-const sectionObserver = new IntersectionObserver((entries) => {
-    if (isScrollingFromClick) return;
-
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            const id = entry.target.getAttribute('id');
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href') === `#${id}`) {
-                    link.classList.add('active');
-                }
-            });
-        }
-    });
-}, sectionObserverOptions);
-
-document.querySelectorAll('section[id]').forEach(section => {
-    sectionObserver.observe(section);
-});
+// IntersectionObserver removed in favor of scroll-based detection in onScroll
 
 // ===== Mobile Menu Toggle =====
 const mobileToggle = document.getElementById('mobileToggle');
@@ -145,10 +120,32 @@ function onScroll() {
         }
     }
 
-    // Parallax Effect (Optimized with translate3d)
+    // Parallax Effect
     if (heroSection && scrollY < window.innerHeight) {
-        // use translate3d to force hardware acceleration
         heroSection.style.transform = `translate3d(0, ${scrollY * 0.4}px, 0)`;
+    }
+
+    // Active Link Detection (Restored Scroll Spy)
+    if (!isScrollingFromClick) {
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
+        let current = '';
+
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionId = section.getAttribute('id');
+            // Trigger when section top is near viewport top (minus navbar offset)
+            if (scrollY >= (sectionTop - 150)) {
+                current = sectionId;
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === `#${current}`) {
+                link.classList.add('active');
+            }
+        });
     }
 
     isTicking = false;
@@ -162,55 +159,24 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 
 
-// ===== Form Validation & Submission =====
-const reservationForm = document.getElementById('reservationForm');
+// ===== Email Copy Functionality =====
+function copyEmail() {
+    const email = document.getElementById('contactEmail').innerText;
+    const tooltip = document.getElementById('copyTooltip');
 
-reservationForm?.addEventListener('submit', function (e) {
-    e.preventDefault();
+    navigator.clipboard.writeText(email).then(() => {
+        // Show tooltip
+        tooltip.classList.add('visible');
 
-    const formData = {
-        name: document.getElementById('name').value,
-        email: document.getElementById('email').value,
-        phone: document.getElementById('phone').value,
-        guests: document.getElementById('guests').value,
-        date: document.getElementById('date').value,
-        time: document.getElementById('time').value,
-        message: document.getElementById('message').value
-    };
-
-    if (!formData.name || !formData.email || !formData.phone || !formData.guests || !formData.date || !formData.time) {
-        alert('Prosím vyplňte všechna povinná pole.');
-        return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-        alert('Prosím zadejte platnou e-mailovou adresu.');
-        return;
-    }
-
-    const selectedDate = new Date(formData.date);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    if (selectedDate < today) {
-        alert('Prosím vyberte budoucí datum.');
-        return;
-    }
-
-    alert(`Děkujeme za rezervaci, ${formData.name}!\n\nVaše rezervace:\nDatum: ${formData.date}\nČas: ${formData.time}\nPočet hostů: ${formData.guests}\n\nBrzy vás budeme kontaktovat na ${formData.email} pro potvrzení.`);
-    reservationForm.reset();
-});
-
-// ===== Set Minimum Date for Reservation =====
-const dateInput = document.getElementById('date');
-if (dateInput) {
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const minDate = tomorrow.toISOString().split('T')[0];
-    dateInput.setAttribute('min', minDate);
+        // Hide after 2 seconds
+        setTimeout(() => {
+            tooltip.classList.remove('visible');
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy: ', err);
+    });
 }
+
 
 // ===== Initialize =====
 document.addEventListener('DOMContentLoaded', () => {
