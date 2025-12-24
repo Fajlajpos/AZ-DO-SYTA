@@ -1,0 +1,11 @@
+{
+  "name": "az-do-syta",
+  "version": "1.0.0",
+  "description": "Restaurace AŽ DO SYTA - webová stránka",
+  "scripts": {
+    "dev": "npx -y http-server -p 8000 -o"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

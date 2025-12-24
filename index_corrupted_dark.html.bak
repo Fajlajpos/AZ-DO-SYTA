@@ -12,7 +12,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -35,12 +35,6 @@
                 <li><a href="#o-nas" class="nav-link">O NÁS</a></li>
                 <li><a href="#menu" class="nav-link">MENU</a></li>
                 <li><a href="#rezervace" class="nav-link">REZERVACE</a></li>
-                <li>
-                    <label class="theme-toggle" aria-label="Přepnout téma">
-                        <input type="checkbox" id="themeToggle" class="theme-checkbox">
-                        <span class="theme-slider"></span>
-                    </label>
-                </li>
             </ul>
         </div>
     </nav>
@@ -262,92 +256,62 @@
 
                         <div class="form-group">
                             <label for="message">Speciální požadavky</label>
-                            <textarea id="message" name="message" rows="4"></textarea>
+                            <textarea id="message" name="message" rows="4"
+                                placeholder="Alergie, dietní omezení, oslava..."></textarea>
                         </div>
 
-                        <button type="submit" class="submit-button">Rezervovat stůl</button>
+                        <button type="submit" class="submit-button">Odeslat rezervaci</button>
                     </form>
                 </div>
 
                 <div class="contact-info">
                     <div class="info-card">
-                        <h3>Otevírací doba</h3>
-                        <p>Po - Pá: 11:00 - 23:00</p>
-                        <p>So - Ne: 12:00 - 24:00</p>
+                        <h3>Kontaktní údaje</h3>
+                        <div class="info-item">
+                            <strong>Adresa:</strong>
+                            <p>Pařížská 123<br>110 00 Praha 1</p>
+                        </div>
+                        <div class="info-item">
+                            <strong>Telefon:</strong>
+                            <p><a href="tel:+420123456789">+420 123 456 789</a></p>
+                        </div>
+                        <div class="info-item">
+                            <strong>E-mail:</strong>
+                            <p><a href="mailto:info@azdosyta.cz">info@azdosyta.cz</a></p>
+                        </div>
                     </div>
+
                     <div class="info-card">
-                        <h3>Kontakt</h3>
-                        <p>Dlouhá 123, Praha 1</p>
-                        <p>+420 123 456 789</p>
-                        <p>rezervace@azdosyta.cz</p>
+                        <h3>Otevírací doba</h3>
+                        <div class="opening-hours">
+                            <div class="hours-row">
+                                <span>Pondělí - Čtvrtek</span>
+                                <span>11:00 - 23:00</span>
+                            </div>
+                            <div class="hours-row">
+                                <span>Pátek - Sobota</span>
+                                <span>11:00 - 01:00</span>
+                            </div>
+                            <div class="hours-row">
+                                <span>Neděle</span>
+                                <span>12:00 - 22:00</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-content">
-                <div class="footer-brand">
-                    <div class="footer-logo">
-                        <span class="logo-main">AŽ DO SYTA</span>
-                        <span class="logo-tagline">Tradiční chutě • Moderní styl</span>
+                    <div class="info-card">
+                        <h3>Sledujte nás</h3>
+                        <div class="social-links">
+                            <a href="#" class="social-link">Instagram</a>
+                            <a href="#" class="social-link">Facebook</a>
+                            <a href="#" class="social-link">TripAdvisor</a>
+                        </div>
                     </div>
-                    <p class="footer-description">Objevte českou kuchyni v moderním hávu</p>
+                    <p>&copy; 2024 AŽ DO SYTA. Všechna práva vyhrazena.</p>
                 </div>
+                </footer>
 
-                <div class="footer-links">
-                    <h4>Navigace</h4>
-                    <ul>
-                        <li><a href="#uvod">Úvod</a></li>
-                        <li><a href="#o-nas">O nás</a></li>
-                        <li><a href="#menu">Menu</a></li>
-                        <li><a href="#rezervace">Rezervace</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-contact">
-                    <h4>Kontakt</h4>
-                    <p>Dlouhá 123, Praha 1</p>
-                    <p>+420 123 456 789</p>
-                    <p>info@azdosyta.cz</p>
-                </div>
-
-                <div class="footer-social">
-                    <h4>Sledujte nás</h4>
-                    <div class="social-links">
-                        <a href="#" class="social-link" aria-label="Instagram">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                            </svg>
-                        </a>
-                        <a href="#" class="social-link" aria-label="Facebook">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="footer-bottom">
-                <p class="copyright">&copy; 2025 AŽ DO SYTA. Všechna práva vyhrazena.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Back to Top Button -->
-    <button id="backToTop" class="back-to-top" aria-label="Zpět nahoru">
-        ↑
-    </button>
-
-    <script src="script.js?v=4"></script>
+                <script src="script.js"></script>
 </body>
 
 </html>
