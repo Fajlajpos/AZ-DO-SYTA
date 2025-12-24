@@ -315,7 +315,7 @@ a {
 .cta-button {
     display: inline-block;
     padding: 1rem 3rem;
-    background: linear-gradient(135deg, var(--accent-gold), #C9A227);
+    background: #D4AF37;
     color: var(--text-dark);
     font-weight: 600;
     font-size: 1.1rem;
@@ -584,7 +584,7 @@ a {
 }
 
 .reservation-section .title-underline {
-    background: var(--accent-gold);
+    background: #D4AF37;
 }
 
 .reservation-section .section-subtitle {
@@ -662,7 +662,7 @@ a {
 
 .submit-button {
     padding: 1.2rem 3rem;
-    background: linear-gradient(135deg, var(--accent-gold), #C9A227);
+    background: #D4AF37;
     color: var(--text-dark);
     font-weight: 700;
     font-size: 1.1rem;
@@ -696,8 +696,9 @@ a {
 .info-card h3 {
     font-family: var(--font-heading);
     font-size: 1.5rem;
+    font-size: 1.5rem;
     margin-bottom: 1.5rem;
-    color: var(--accent-gold);
+    color: #D4AF37;
 }
 
 .info-item {
@@ -1287,14 +1288,14 @@ a {
         font-size: 1.1rem;
     }
 }
+
 /* ===== Force Toggle Colors Override ===== */
 .theme-slider {
     background: #4a5568 !important;
     background-image: none !important;
 }
 
-.theme-checkbox:checked + .theme-slider {
+.theme-checkbox:checked+.theme-slider {
     background: #D4AF37 !important;
     background-image: none !important;
 }
-
