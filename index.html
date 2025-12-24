@@ -12,7 +12,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=6">
+    <link rel="stylesheet" href="style.css?v=7">
 </head>
 
 <body>
@@ -368,6 +368,20 @@
     <button id="backToTop" class="back-to-top" aria-label="Zpět nahoru">
         ↑
     </button>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox">
+        <span class="lightbox-close" aria-label="Zavřít">&times;</span>
+        <button class="lightbox-prev" aria-label="Předchozí">&#10094;</button>
+        <div class="lightbox-content">
+            <img class="lightbox-image" src="" alt="">
+            <div class="lightbox-caption">
+                <h3 id="lightboxTitle"></h3>
+                <p id="lightboxDesc"></p>
+            </div>
+        </div>
+        <button class="lightbox-next" aria-label="Další">&#10095;</button>
+    </div>
 
     <script src="script.js?v=6"></script>
 </body>
