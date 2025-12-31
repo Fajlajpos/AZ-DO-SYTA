@@ -330,3 +330,328 @@ function handleSwipe() {
     }
 }
 
+
+// ===== Daily Menu Google Sheets Integration =====
+
+// CONFIGURATION - Update these values with your Google Sheets information
+const DAILY_MENU_CONFIG = {
+    // Option 1: Public Google Sheets (Recommended for simplicity)
+    // Replace SHEET_ID with your actual Google Sheets ID
+    // Example: https://docs.google.com/spreadsheets/d/1ABC123xyz/edit
+    // The SHEET_ID is: 1ABC123xyz
+    sheetId: 'YOUR_SHEET_ID_HERE',
+    sheetName: 'Sheet1', // Name of the sheet tab
+
+    // Option 2: Google Sheets API (Uncomment and configure if using API)
+    // apiKey: 'YOUR_API_KEY_HERE',
+    // range: 'Sheet1!A2:F8', // Adjust range as needed
+
+    // Cache settings
+    cacheKey: 'dailyMenu_cache',
+    cacheDuration: 4 * 60 * 60 * 1000, // 4 hours in milliseconds
+
+    // Timeout for API calls
+    fetchTimeout: 10000 // 10 seconds
+};
+
+// Czech day names
+const CZECH_DAYS = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'];
+
+// Initialize Daily Menu on page load
+document.addEventListener('DOMContentLoaded', () => {
+    initDailyMenu();
+});
+
+async function initDailyMenu() {
+    const loader = document.getElementById('menuLoader');
+    const error = document.getElementById('menuError');
+    const content = document.getElementById('menuContent');
+
+    // Check if configuration is set
+    if (DAILY_MENU_CONFIG.sheetId === 'YOUR_SHEET_ID_HERE') {
+        showConfigurationMessage();
+        return;
+    }
+
+    // Try to load from cache first
+    const cachedData = getCachedMenu();
+    if (cachedData) {
+        console.log('Loading menu from cache');
+        renderDailyMenu(cachedData);
+        loader.style.display = 'none';
+        content.style.display = 'grid';
+
+        // Fetch fresh data in background
+        fetchDailyMenu(true);
+        return;
+    }
+
+    // Fetch fresh data
+    await fetchDailyMenu(false);
+}
+
+async function fetchDailyMenu(isBackgroundUpdate = false) {
+    const loader = document.getElementById('menuLoader');
+    const error = document.getElementById('menuError');
+    const content = document.getElementById('menuContent');
+
+    if (!isBackgroundUpdate) {
+        loader.style.display = 'flex';
+        error.style.display = 'none';
+        content.style.display = 'none';
+    }
+
+    try {
+        // Construct the URL for public Google Sheets
+        const url = `https://docs.google.com/spreadsheets/d/${DAILY_MENU_CONFIG.sheetId}/gviz/tq?tqx=out:json&sheet=${DAILY_MENU_CONFIG.sheetName}`;
+
+        // Fetch with timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), DAILY_MENU_CONFIG.fetchTimeout);
+
+        const response = await fetch(url, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const text = await response.text();
+
+        // Parse Google Sheets JSON response (it's wrapped in a function call)
+        const jsonString = text.substring(47).slice(0, -2);
+        const data = JSON.parse(jsonString);
+
+        // Parse the data
+        const menuData = parseGoogleSheetsData(data);
+
+        if (menuData.length === 0) {
+            showNoMenuMessage();
+            return;
+        }
+
+        // Cache the data
+        setCachedMenu(menuData);
+
+        // Render the menu
+        renderDailyMenu(menuData);
+
+        loader.style.display = 'none';
+        error.style.display = 'none';
+        content.style.display = 'grid';
+
+        console.log('Daily menu loaded successfully');
+
+    } catch (err) {
+        console.error('Error fetching daily menu:', err);
+
+        if (!isBackgroundUpdate) {
+            loader.style.display = 'none';
+            error.style.display = 'flex';
+
+            const errorMessage = document.getElementById('errorMessage');
+            if (err.name === 'AbortError') {
+                errorMessage.textContent = 'Načítání menu trvá příliš dlouho. Zkuste to prosím později.';
+            } else {
+                errorMessage.textContent = 'Nepodařilo se načíst menu. Zkuste to prosím později.';
+            }
+        }
+    }
+}
+
+function parseGoogleSheetsData(data) {
+    const menuData = [];
+
+    try {
+        const rows = data.table.rows;
+
+        // Expected columns: Day | Soup | Main Dish 1 | Main Dish 2 | Price | Allergens
+        // Adjust this parsing based on your actual sheet structure
+
+        rows.forEach(row => {
+            if (!row.c || !row.c[0]) return; // Skip empty rows
+
+            const day = row.c[0]?.v || '';
+            const soup = row.c[1]?.v || '';
+            const mainDish1 = row.c[2]?.v || '';
+            const mainDish2 = row.c[3]?.v || '';
+            const price = row.c[4]?.v || '';
+            const allergens = row.c[5]?.v || '';
+
+            if (day) {
+                menuData.push({
+                    day: day,
+                    soup: soup,
+                    mainDish1: mainDish1,
+                    mainDish2: mainDish2,
+                    price: price,
+                    allergens: allergens
+                });
+            }
+        });
+
+    } catch (err) {
+        console.error('Error parsing menu data:', err);
+    }
+
+    return menuData;
+}
+
+function renderDailyMenu(menuData) {
+    const content = document.getElementById('menuContent');
+    content.innerHTML = '';
+
+    const today = new Date().getDay();
+    const todayName = CZECH_DAYS[today];
+
+    menuData.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'daily-menu-card';
+
+        // Check if this is today's menu
+        if (item.day.toLowerCase() === todayName.toLowerCase()) {
+            card.classList.add('today');
+        }
+
+        // Build the card HTML
+        let cardHTML = `
+            <div class="menu-card-header">
+                <div class="menu-day">${item.day}</div>
+            </div>
+            <div class="menu-card-content">
+        `;
+
+        // Add soup if available
+        if (item.soup) {
+            cardHTML += `
+                <div class="menu-course">
+                    <div class="course-label">Polévka</div>
+                    <div class="course-name">${item.soup}</div>
+                </div>
+            `;
+        }
+
+        // Add main dishes
+        if (item.mainDish1) {
+            cardHTML += `
+                <div class="menu-course">
+                    <div class="course-label">Hlavní jídlo</div>
+                    <div class="course-name">${item.mainDish1}</div>
+                </div>
+            `;
+        }
+
+        if (item.mainDish2) {
+            cardHTML += `
+                <div class="menu-course">
+                    <div class="course-label">Alternativa</div>
+                    <div class="course-name">${item.mainDish2}</div>
+                </div>
+            `;
+        }
+
+        cardHTML += `</div>`; // Close menu-card-content
+
+        // Add footer with price and allergens
+        if (item.price || item.allergens) {
+            cardHTML += `<div class="menu-card-footer">`;
+
+            if (item.price) {
+                cardHTML += `
+                    <div>
+                        <div class="price-label">Cena</div>
+                        <div class="menu-price">${item.price}</div>
+                    </div>
+                `;
+            }
+
+            if (item.allergens) {
+                cardHTML += `
+                    <div class="course-allergens">
+                        Alergeny: ${item.allergens}
+                    </div>
+                `;
+            }
+
+            cardHTML += `</div>`; // Close menu-card-footer
+        }
+
+        card.innerHTML = cardHTML;
+        content.appendChild(card);
+    });
+}
+
+function showNoMenuMessage() {
+    const loader = document.getElementById('menuLoader');
+    const error = document.getElementById('menuError');
+    const content = document.getElementById('menuContent');
+
+    loader.style.display = 'none';
+    error.style.display = 'none';
+    content.style.display = 'block';
+
+    content.innerHTML = `
+        <div class="no-menu-message">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            <h3>Dnes není menu k dispozici</h3>
+            <p>Omlouváme se, denní menu momentálně není dostupné. Podívejte se prosím na naše stálé menu níže.</p>
+        </div>
+    `;
+}
+
+function showConfigurationMessage() {
+    const loader = document.getElementById('menuLoader');
+    const error = document.getElementById('menuError');
+    const content = document.getElementById('menuContent');
+
+    loader.style.display = 'none';
+    error.style.display = 'flex';
+    content.style.display = 'none';
+
+    const errorMessage = document.getElementById('errorMessage');
+    errorMessage.innerHTML = `
+        <strong>Konfigurace Google Sheets chybí</strong><br>
+        Prosím, nastavte SHEET_ID v souboru script.js (řádek ~336).<br>
+        <small>Viz dokumentace v kódu pro více informací.</small>
+    `;
+}
+
+// Cache Management
+function getCachedMenu() {
+    try {
+        const cached = localStorage.getItem(DAILY_MENU_CONFIG.cacheKey);
+        if (!cached) return null;
+
+        const { data, timestamp } = JSON.parse(cached);
+        const now = Date.now();
+
+        // Check if cache is still valid
+        if (now - timestamp < DAILY_MENU_CONFIG.cacheDuration) {
+            return data;
+        }
+
+        // Cache expired
+        localStorage.removeItem(DAILY_MENU_CONFIG.cacheKey);
+        return null;
+
+    } catch (err) {
+        console.error('Error reading cache:', err);
+        return null;
+    }
+}
+
+function setCachedMenu(data) {
+    try {
+        const cacheData = {
+            data: data,
+            timestamp: Date.now()
+        };
+        localStorage.setItem(DAILY_MENU_CONFIG.cacheKey, JSON.stringify(cacheData));
+    } catch (err) {
+        console.error('Error setting cache:', err);
+    }
+}
+

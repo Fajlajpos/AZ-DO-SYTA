@@ -471,6 +471,284 @@ a {
     object-fit: cover;
 }
 
+/* ===== Daily Menu Section ===== */
+.daily-menu-section {
+    background: #fff;
+    position: relative;
+}
+
+[data-theme="dark"] .daily-menu-section {
+    background: var(--bg-secondary);
+}
+
+/* Loading Indicator */
+.menu-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    gap: 1.5rem;
+}
+
+.loader-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(139, 21, 56, 0.1);
+    border-top: 4px solid var(--primary-burgundy);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+[data-theme="dark"] .loader-spinner {
+    border: 4px solid rgba(212, 165, 116, 0.2);
+    border-top: 4px solid var(--primary-burgundy);
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.menu-loader p {
+    font-size: 1.1rem;
+    color: #666;
+    font-weight: 500;
+}
+
+[data-theme="dark"] .menu-loader p {
+    color: #999;
+}
+
+/* Error Message */
+.menu-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    gap: 1.5rem;
+    text-align: center;
+}
+
+.menu-error svg {
+    color: var(--primary-burgundy);
+    opacity: 0.7;
+}
+
+.menu-error p {
+    font-size: 1.1rem;
+    color: #666;
+    max-width: 500px;
+}
+
+[data-theme="dark"] .menu-error p {
+    color: #999;
+}
+
+/* Daily Menu Grid */
+.daily-menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 1rem 0;
+}
+
+/* Daily Menu Card */
+.daily-menu-card {
+    background: var(--bg-cream);
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: var(--transition);
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+[data-theme="dark"] .daily-menu-card {
+    background: var(--bg-card);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.daily-menu-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Today's Menu Highlight */
+.daily-menu-card.today {
+    border-color: var(--accent-gold);
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.05), var(--bg-cream));
+}
+
+[data-theme="dark"] .daily-menu-card.today {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), var(--bg-card));
+}
+
+.daily-menu-card.today::before {
+    content: 'DNES';
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: var(--accent-gold);
+    color: var(--text-dark);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+/* Card Header */
+.menu-card-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(139, 21, 56, 0.1);
+}
+
+[data-theme="dark"] .menu-card-header {
+    border-bottom-color: rgba(212, 165, 116, 0.2);
+}
+
+.menu-day {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    color: var(--primary-burgundy);
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+}
+
+.menu-date {
+    font-size: 0.9rem;
+    color: #666;
+    font-weight: 400;
+}
+
+[data-theme="dark"] .menu-date {
+    color: #999;
+}
+
+/* Menu Items */
+.menu-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.menu-course {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.course-label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent-gold);
+    font-weight: 600;
+}
+
+.course-name {
+    font-size: 1.1rem;
+    color: var(--text-dark);
+    line-height: 1.5;
+    font-weight: 500;
+}
+
+.course-allergens {
+    font-size: 0.85rem;
+    color: #888;
+    font-style: italic;
+}
+
+[data-theme="dark"] .course-allergens {
+    color: #aaa;
+}
+
+/* Menu Price */
+.menu-card-footer {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 2px solid rgba(139, 21, 56, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+[data-theme="dark"] .menu-card-footer {
+    border-top-color: rgba(212, 165, 116, 0.2);
+}
+
+.menu-price {
+    font-family: var(--font-heading);
+    font-size: 1.6rem;
+    color: var(--primary-burgundy);
+    font-weight: 700;
+}
+
+.price-label {
+    font-size: 0.85rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+[data-theme="dark"] .price-label {
+    color: #999;
+}
+
+/* No Menu Available */
+.no-menu-message {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.no-menu-message svg {
+    width: 80px;
+    height: 80px;
+    color: var(--primary-burgundy);
+    opacity: 0.3;
+    margin: 0 auto 1.5rem;
+}
+
+.no-menu-message h3 {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    color: var(--primary-burgundy);
+    margin-bottom: 0.5rem;
+}
+
+.no-menu-message p {
+    font-size: 1.1rem;
+    color: #666;
+}
+
+[data-theme="dark"] .no-menu-message p {
+    color: #999;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .daily-menu-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .daily-menu-card {
+        padding: 1.5rem;
+    }
+
+    .menu-day {
+        font-size: 1.5rem;
+    }
+}
+
 /* ===== Menu Section ===== */
 .menu-section {
     background: #fff;
@@ -1360,7 +1638,7 @@ a {
     max-height: 70vh;
     object-fit: contain;
     border-radius: 8px;
-    box-shadow: 0 0 50px rgba(0,0,0,0.5);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
     transform: scale(0.9);
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
@@ -1428,19 +1706,32 @@ a {
 .menu-image {
     cursor: pointer;
 }
+
 .menu-image .menu-overlay {
-    pointer-events: none; /* Let click pass to image wrapper */
+    pointer-events: none;
+    /* Let click pass to image wrapper */
 }
 
 @media (max-width: 768px) {
-    .lightbox-prev, .lightbox-next {
+
+    .lightbox-prev,
+    .lightbox-next {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
         font-size: 2rem;
         padding: 10px;
     }
-    .lightbox-prev { left: 10px; }
-    .lightbox-next { right: 10px; }
-    .lightbox-image { max-height: 60vh; }
+
+    .lightbox-prev {
+        left: 10px;
+    }
+
+    .lightbox-next {
+        right: 10px;
+    }
+
+    .lightbox-image {
+        max-height: 60vh;
+    }
 }

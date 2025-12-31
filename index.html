@@ -33,6 +33,7 @@
             <ul class="nav-menu" id="navMenu">
                 <li><a href="#uvod" class="nav-link active">ÚVOD</a></li>
                 <li><a href="#o-nas" class="nav-link">O NÁS</a></li>
+                <li><a href="#denni-menu" class="nav-link">DENNÍ MENU</a></li>
                 <li><a href="#menu" class="nav-link">MENU</a></li>
                 <li><a href="#rezervace" class="nav-link">REZERVACE</a></li>
                 <li>
@@ -100,6 +101,36 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <!-- DENNÍ MENU Section -->
+    <section id="denni-menu" class="daily-menu-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Denní menu</h2>
+                <div class="title-underline"></div>
+                <p class="section-subtitle">Čerstvé menu každý den • Aktualizováno denně</p>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="menuLoader" class="menu-loader">
+                <div class="loader-spinner"></div>
+                <p>Načítání menu...</p>
+            </div>
+
+            <!-- Error Message -->
+            <div id="menuError" class="menu-error" style="display: none;">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <p id="errorMessage">Nepodařilo se načíst menu. Zkuste to prosím později.</p>
+            </div>
+
+            <!-- Menu Content -->
+            <div id="menuContent" class="daily-menu-grid"></div>
         </div>
     </section>
 
