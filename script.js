@@ -521,6 +521,8 @@ function renderDailyMenu(menuData) {
     // We add a specific style (max-width) to keep it reasonable for a single item
     const card = document.createElement('div');
     card.className = 'menu-item';
+
+    // Allow width to fit content up to a max, but let height be natural
     card.style.maxWidth = '500px';
     card.style.width = '100%';
     card.style.margin = '0'; // Flexbox handles centering
@@ -531,13 +533,14 @@ function renderDailyMenu(menuData) {
     card.style.display = 'block';
 
     const cardHTML = `
-        <div class="menu-image">
+        <!-- Override fixed height of .menu-image to allow natural image height -->
+        <div class="menu-image" style="height: auto !important; min-height: auto !important; aspect-ratio: auto !important; padding-bottom: 0;">
             <img 
                 src="${directImgUrl}" 
                 alt="Denní menu" 
                 onload="this.style.opacity=1" 
                 onerror="this.onerror=null; this.src='${fallbackImgUrl}';"
-                style="min-height: 300px; object-fit: cover; width: 100%; display: block; background: #f0f0f0;"
+                style="width: 100%; height: auto; display: block; object-fit: contain; min-height: 200px; background: #f0f0f0;"
             >
             <div class="menu-overlay">
                 <span class="view-detail">Zobrazit detail</span>
