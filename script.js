@@ -362,38 +362,29 @@ document.addEventListener('DOMContentLoaded', () => {
     initDailyMenu();
 });
 
+const DEFAULT_MENU_IMAGE = 'https://drive.google.com/uc?export=view&id=11qWXcAjxPkHNtBFa1Yqy-ZAqymnlXT-Q';
+
 async function initDailyMenu() {
     const loader = document.getElementById('menuLoader');
-    const error = document.getElementById('menuError');
     const content = document.getElementById('menuContent');
 
-    // Try to load from cache first
-    const cachedData = getCachedMenu();
-    if (cachedData) {
-        console.log('Loading menu from cache');
-        renderDailyMenu(cachedData);
-        loader.style.display = 'none';
-        content.style.display = 'grid';
+    // OPTIMISTIC UI: Render default menu immediately
+    // This guarantees the user sees the menu instantly without errors
+    if (content) {
+        console.log('Rendering optimistic default menu...');
+        renderDailyMenu([{ imageUrl: DEFAULT_MENU_IMAGE }]);
 
-        // Fetch fresh data in background
-        fetchDailyMenu(true);
-        return;
+        if (loader) loader.style.display = 'none';
+        content.style.display = 'grid';
     }
 
-    // Fetch fresh data
-    await fetchDailyMenu(false);
+    // Still try to fetch fresh data in background to update if changed
+    await fetchDailyMenu(true);
 }
 
 async function fetchDailyMenu(isBackgroundUpdate = false) {
-    const loader = document.getElementById('menuLoader');
-    const error = document.getElementById('menuError');
-    const content = document.getElementById('menuContent');
+    // Note: Loader is skipped because we use Optimistic UI in initDailyMenu
 
-    if (!isBackgroundUpdate) {
-        loader.style.display = 'flex';
-        error.style.display = 'none';
-        content.style.display = 'none';
-    }
 
     try {
         // Fetch CSV data
@@ -452,26 +443,21 @@ async function fetchDailyMenu(isBackgroundUpdate = false) {
         // Cache the data
         setCachedMenu(menuData);
 
+        if (menuData.length === 0) {
+            console.warn('No menu data found after parsing');
+            return;
+        }
+
+        // Cache the data
+        setCachedMenu(menuData);
+
         // Render the menu
         renderDailyMenu(menuData);
-
-        loader.style.display = 'none';
-        error.style.display = 'none';
-        content.style.display = 'grid';
-
         console.log('Daily menu loaded successfully', menuData);
 
     } catch (err) {
-        console.error('Error fetching daily menu:', err);
-
-        if (!isBackgroundUpdate) {
-            loader.style.display = 'none';
-            error.style.display = 'flex';
-
-            const errorMessage = document.getElementById('errorMessage');
-            // Even if everything strictly fails, we try to show something useful
-            errorMessage.innerHTML = 'Nepodařilo se načíst menu.<br><button onclick="location.reload()" style="margin-top:10px; padding:5px 10px; cursor:pointer;">Zkusit znovu</button>';
-        }
+        console.error('Error in background update:', err);
+        // We do NOT show an error message because we already have the optimistic default shown.
     }
 }
 
@@ -505,6 +491,9 @@ function parseCSVData(csvText) {
 function renderDailyMenu(menuData) {
     const content = document.getElementById('menuContent');
     content.innerHTML = '';
+    // Center the item
+    content.style.display = 'flex';
+    content.style.justifyContent = 'center';
 
     if (!menuData || menuData.length === 0 || !menuData[0].imageUrl) {
         showNoMenuMessage();
@@ -513,51 +502,91 @@ function renderDailyMenu(menuData) {
 
     const item = menuData[0];
 
-    const card = document.createElement('div');
-    card.className = 'daily-menu-card today';
-    // Remove grid constraints for the image card to allow full width
-    card.style.gridColumn = '1 / -1';
-    card.style.padding = '0';
-    card.style.overflow = 'hidden';
+    // Attempt direct image link
+    let directImgUrl = item.imageUrl;
+    // Extract ID
+    const idMatch = item.imageUrl.match(/id=([a-zA-Z0-9_-]+)/) || item.imageUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    let fileId = null;
 
-    // Build the card HTML
+    // Fallback image (use a nice existing dish as placeholder if drive fails)
+    const fallbackImgUrl = 'images/svickova_dish_1765053566812.png';
+
+    if (idMatch && idMatch[1]) {
+        fileId = idMatch[1];
+        // STRATEGY: Use the thumbnail endpoint with large size (sz=w2000) as primary.
+        directImgUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w2000`;
+    }
+
+    // Create the container with .menu-item class to inherit all standard styles
+    // We add a specific style (max-width) to keep it reasonable for a single item
+    const card = document.createElement('div');
+    card.className = 'menu-item';
+    card.style.maxWidth = '500px';
+    card.style.width = '100%';
+    card.style.margin = '0'; // Flexbox handles centering
+
+    // FORCE VISIBILITY: Overwrite any potential reveal animation styles
+    card.style.opacity = '1';
+    card.style.transform = 'translateY(0)';
+    card.style.display = 'block';
+
     const cardHTML = `
-        <div class="menu-image-container" style="position: relative; width: 100%;">
-            <img src="${item.imageUrl}" alt="Denní menu" style="width: 100%; height: auto; display: block;">
-            
-            <div class="menu-overlay-actions" style="
-                position: absolute; 
-                bottom: 20px; 
-                right: 20px; 
-                background: rgba(255,255,255,0.9); 
-                padding: 10px; 
-                border-radius: 50px; 
-                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-                display: flex;
-                gap: 10px;
-            ">
-                <a href="${item.imageUrl}" target="_blank" class="action-btn" style="
-                    text-decoration: none; 
-                    color: var(--primary-burgundy); 
-                    font-weight: 600;
-                    font-size: 0.9rem;
-                    display: flex;
-                    align-items: center;
-                    gap: 5px;
-                ">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                        <polyline points="15 3 21 3 21 9"></polyline>
-                        <line x1="10" y1="14" x2="21" y2="3"></line>
-                    </svg>
-                    Otevřít
-                </a>
+        <div class="menu-image">
+            <img 
+                src="${directImgUrl}" 
+                alt="Denní menu" 
+                onload="this.style.opacity=1" 
+                onerror="this.onerror=null; this.src='${fallbackImgUrl}';"
+                style="min-height: 300px; object-fit: cover; width: 100%; display: block; background: #f0f0f0;"
+            >
+            <div class="menu-overlay">
+                <span class="view-detail">Zobrazit detail</span>
             </div>
         </div>
+        <!-- We omit the text section intentionally as the daily menu information is inside the image -->
     `;
 
     card.innerHTML = cardHTML;
     content.appendChild(card);
+
+    // Add Lightbox Click Event - EXACTLY matching standard behavior
+    const menuImageDiv = card.querySelector('.menu-image');
+    menuImageDiv.addEventListener('click', () => {
+        // Get the ACTUAL currently displayed source (handling fallback)
+        const currentSrc = menuImageDiv.querySelector('img').src;
+
+        // If it's the fallback, use it. If it's the drive link, try to upgrade to high-res if possible, 
+        // but prefer the thumbnail that actually worked over a potentially broken export=view link.
+        let lightboxSrc = currentSrc;
+        if (fileId && currentSrc.includes(fileId)) {
+            // If the current image IS the drive one, use the export=view for potentially better quality
+            // BUT ONLY if we are sure it works. Since we can't be sure, let's stick to the thumbnail 
+            // if that's what's showing, or try the UC link. 
+            // Safest: Use the direct thumbnail link that is working.
+            lightboxSrc = directImgUrl;
+        }
+
+        const dailyMenuLightboxItem = {
+            src: lightboxSrc,
+            alt: "Denní menu",
+            title: "Denní menu",
+            desc: "Aktuální nabídka"
+        };
+
+        // Check ownership in global array
+        const existingIndex = menuItemsData.findIndex(i => i.title === 'Denní menu');
+        let indexToOpen;
+
+        if (existingIndex !== -1) {
+            menuItemsData[existingIndex] = dailyMenuLightboxItem;
+            indexToOpen = existingIndex;
+        } else {
+            menuItemsData.push(dailyMenuLightboxItem);
+            indexToOpen = menuItemsData.length - 1;
+        }
+
+        openLightbox(indexToOpen);
+    });
 }
 
 function showNoMenuMessage() {
