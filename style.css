@@ -472,13 +472,38 @@ a {
 }
 
 /* ===== Daily Menu Section ===== */
+/* ===== Daily Menu Section ===== */
+/* ===== Daily Menu Section ===== */
 .daily-menu-section {
-    background: #fff;
+    background: #F2F0EB;
+    /* Slightly darker cream for contrast */
     position: relative;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
 }
 
 [data-theme="dark"] .daily-menu-section {
-    background: var(--bg-secondary);
+    background: #222222;
+    /* Slightly lighter charcoal for visibility */
+}
+
+/* Enhanced styling for the Daily Menu Card */
+.daily-menu-grid .menu-item {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06);
+    /* Softer shadow */
+    border-radius: 20px;
+    /* Ensure rounded corners */
+    overflow: hidden;
+    /* Fix for hover edge sharpness */
+    transform: translateZ(0);
+    /* Hardware acceleration fix for radius */
+    margin: 10px;
+    /* prevent shadow clipping */
+}
+
+.daily-menu-grid .menu-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.12);
 }
 
 /* Loading Indicator */

@@ -227,7 +227,8 @@ const closeBtn = document.querySelector('.lightbox-close');
 const prevBtn = document.querySelector('.lightbox-prev');
 const nextBtn = document.querySelector('.lightbox-next');
 
-let menuItemsData = [];
+let mainMenuItemsData = []; // Stores the standard menu items
+let activeLightboxItems = []; // Stores the currently active set (either main menu or daily menu)
 let currentImageIndex = 0;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -238,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const title = item.querySelector('.menu-info h3').innerText;
         const desc = item.querySelector('.menu-info p').innerText;
 
-        menuItemsData.push({
+        mainMenuItemsData.push({
             src: img.src,
             alt: img.alt,
             title: title,
@@ -248,6 +249,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Add click listener to the image container
         const imageContainer = item.querySelector('.menu-image');
         imageContainer.addEventListener('click', () => {
+            // Set context to Main Menu
+            activeLightboxItems = mainMenuItemsData;
             openLightbox(index);
         });
     });
@@ -266,20 +269,34 @@ function closeLightbox() {
 }
 
 function updateLightboxContent() {
-    const data = menuItemsData[currentImageIndex];
+    // Safety check
+    if (!activeLightboxItems || activeLightboxItems.length === 0) return;
+
+    const data = activeLightboxItems[currentImageIndex];
     lightboxImage.src = data.src;
     lightboxImage.alt = data.alt;
     lightboxTitle.innerText = data.title;
     lightboxDesc.innerText = data.desc;
+
+    // Toggle navigation arrows based on item count in CURRENT active set
+    if (activeLightboxItems.length <= 1) {
+        if (prevBtn) prevBtn.style.display = 'none';
+        if (nextBtn) nextBtn.style.display = 'none';
+    } else {
+        if (prevBtn) prevBtn.style.display = 'block';
+        if (nextBtn) nextBtn.style.display = 'block';
+    }
 }
 
 function showNext() {
-    currentImageIndex = (currentImageIndex + 1) % menuItemsData.length;
+    if (!activeLightboxItems.length) return;
+    currentImageIndex = (currentImageIndex + 1) % activeLightboxItems.length;
     updateLightboxContent();
 }
 
 function showPrev() {
-    currentImageIndex = (currentImageIndex - 1 + menuItemsData.length) % menuItemsData.length;
+    if (!activeLightboxItems.length) return;
+    currentImageIndex = (currentImageIndex - 1 + activeLightboxItems.length) % activeLightboxItems.length;
     updateLightboxContent();
 }
 
@@ -523,7 +540,7 @@ function renderDailyMenu(menuData) {
     card.className = 'menu-item';
 
     // Allow width to fit content up to a max, but let height be natural
-    card.style.maxWidth = '500px';
+    card.style.maxWidth = '380px';
     card.style.width = '100%';
     card.style.margin = '0'; // Flexbox handles centering
 
@@ -532,9 +549,25 @@ function renderDailyMenu(menuData) {
     card.style.transform = 'translateY(0)';
     card.style.display = 'block';
 
+    // ALLOW NATURAL HEIGHT:
+    // We override the fixed height from style.css `.menu-image` (which is often 200px or 250px) 
+    // to allow the daily menu image to grow naturally based on its aspect ratio.
+
+    // Get today's date for the badge
+    const today = new Date();
+    const dateOptions = { weekday: 'long', day: 'numeric', month: 'long' };
+    let dateStr = today.toLocaleDateString('cs-CZ', dateOptions);
+    dateStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1); // Capitalize
+
     const cardHTML = `
         <!-- Override fixed height of .menu-image to allow natural image height -->
-        <div class="menu-image" style="height: auto !important; min-height: auto !important; aspect-ratio: auto !important; padding-bottom: 0;">
+        <div class="menu-image" style="height: auto !important; min-height: auto !important; aspect-ratio: auto !important; padding-bottom: 0; position: relative;">
+            
+            <!-- Date Badge -->
+            <div style="position: absolute; top: 15px; right: 15px; background: rgba(255, 255, 255, 0.95); padding: 6px 14px; border-radius: 30px; font-weight: 600; color: #8B1538; box-shadow: 0 4px 15px rgba(0,0,0,0.15); z-index: 5; font-size: 0.85rem; letter-spacing: 0.5px; backdrop-filter: blur(4px);">
+                ${dateStr}
+            </div>
+
             <img 
                 src="${directImgUrl}" 
                 alt="Denní menu" 
@@ -552,20 +585,14 @@ function renderDailyMenu(menuData) {
     card.innerHTML = cardHTML;
     content.appendChild(card);
 
-    // Add Lightbox Click Event - EXACTLY matching standard behavior
+    // Add Lightbox Click Event - EXACTLY matching standard behavior but ISOLATED
     const menuImageDiv = card.querySelector('.menu-image');
     menuImageDiv.addEventListener('click', () => {
         // Get the ACTUAL currently displayed source (handling fallback)
         const currentSrc = menuImageDiv.querySelector('img').src;
 
-        // If it's the fallback, use it. If it's the drive link, try to upgrade to high-res if possible, 
-        // but prefer the thumbnail that actually worked over a potentially broken export=view link.
         let lightboxSrc = currentSrc;
         if (fileId && currentSrc.includes(fileId)) {
-            // If the current image IS the drive one, use the export=view for potentially better quality
-            // BUT ONLY if we are sure it works. Since we can't be sure, let's stick to the thumbnail 
-            // if that's what's showing, or try the UC link. 
-            // Safest: Use the direct thumbnail link that is working.
             lightboxSrc = directImgUrl;
         }
 
@@ -576,19 +603,11 @@ function renderDailyMenu(menuData) {
             desc: "Aktuální nabídka"
         };
 
-        // Check ownership in global array
-        const existingIndex = menuItemsData.findIndex(i => i.title === 'Denní menu');
-        let indexToOpen;
+        // ISOLATION: Set the active lightbox context to ONLY this item
+        // This ensures no navigation arrows appear and Main Menu data is preserved
+        activeLightboxItems = [dailyMenuLightboxItem];
 
-        if (existingIndex !== -1) {
-            menuItemsData[existingIndex] = dailyMenuLightboxItem;
-            indexToOpen = existingIndex;
-        } else {
-            menuItemsData.push(dailyMenuLightboxItem);
-            indexToOpen = menuItemsData.length - 1;
-        }
-
-        openLightbox(indexToOpen);
+        openLightbox(0);
     });
 }
 
