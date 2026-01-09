@@ -483,8 +483,8 @@ function parseCSVData(csvText) {
 
     try {
         // Look for Google Drive link in the text
-        // Matches: https://drive.google.com/file/d/[ID]/view...
-        const driveLinkRegex = /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/;
+        // Matches: https://drive.google.com/file/d/[ID] OR https://drive.google.com/open?id=[ID] etc.
+        const driveLinkRegex = /drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=)([a-zA-Z0-9_-]+)/;
         const match = csvText.match(driveLinkRegex);
 
         if (match && match[1]) {
