@@ -519,19 +519,26 @@ function renderDailyMenu(menuData) {
 
     const item = menuData[0];
 
-    // Attempt direct image link
-    let directImgUrl = item.imageUrl;
-    // Extract ID
+    // Extract ID to generate multiple candidate URLs
     const idMatch = item.imageUrl.match(/id=([a-zA-Z0-9_-]+)/) || item.imageUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
     let fileId = null;
+    let candidateUrls = [];
 
-    // Fallback image (use a nice existing dish as placeholder if drive fails)
+    // Fallback image (use a nice existing dish as placeholder if drive fully fails)
     const fallbackImgUrl = 'images/svickova_dish_1765053566812.png';
 
     if (idMatch && idMatch[1]) {
         fileId = idMatch[1];
-        // STRATEGY: Use the thumbnail endpoint with large size (sz=w2000) as primary.
-        directImgUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w2000`;
+        // STRATEGY: Try multiple Google Drive endpoints in order of reliability/speed
+        candidateUrls = [
+            `https://drive.google.com/thumbnail?id=${fileId}&sz=w2000`,      // Option 1: Thumbnail API (Fastest)
+            `https://lh3.googleusercontent.com/d/${fileId}=s2000`,           // Option 2: LH3 Direct (Very reliable)
+            `https://drive.google.com/uc?export=view&id=${fileId}`,          // Option 3: Standard Export (Can be rate limited)
+            fallbackImgUrl                                                   // Option 4: Local Fallback
+        ];
+    } else {
+        // If we can't parse ID, just use the raw URL provided and then fallback
+        candidateUrls = [item.imageUrl, fallbackImgUrl];
     }
 
     // Create the container with .menu-item class to inherit all standard styles
@@ -549,15 +556,14 @@ function renderDailyMenu(menuData) {
     card.style.transform = 'translateY(0)';
     card.style.display = 'block';
 
-    // ALLOW NATURAL HEIGHT:
-    // We override the fixed height from style.css `.menu-image` (which is often 200px or 250px) 
-    // to allow the daily menu image to grow naturally based on its aspect ratio.
-
     // Get today's date for the badge
     const today = new Date();
     const dateOptions = { weekday: 'long', day: 'numeric', month: 'long' };
     let dateStr = today.toLocaleDateString('cs-CZ', dateOptions);
     dateStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1); // Capitalize
+
+    // We start with the first candidate
+    const initialSrc = candidateUrls[0];
 
     const cardHTML = `
         <!-- Override fixed height of .menu-image to allow natural image height -->
@@ -569,10 +575,13 @@ function renderDailyMenu(menuData) {
             </div>
 
             <img 
-                src="${directImgUrl}" 
+                id="dailyMenuImg"
+                src="${initialSrc}" 
+                data-candidates='${JSON.stringify(candidateUrls)}'
+                data-current-index="0"
                 alt="Denní menu" 
                 onload="this.style.opacity=1" 
-                onerror="this.onerror=null; this.src='${fallbackImgUrl}';"
+                onerror="handleMenuImageError(this)"
                 style="width: 100%; height: auto; display: block; object-fit: contain; min-height: 200px; background: #f0f0f0;"
             >
             <div class="menu-overlay">
@@ -588,28 +597,43 @@ function renderDailyMenu(menuData) {
     // Add Lightbox Click Event - EXACTLY matching standard behavior but ISOLATED
     const menuImageDiv = card.querySelector('.menu-image');
     menuImageDiv.addEventListener('click', () => {
-        // Get the ACTUAL currently displayed source (handling fallback)
-        const currentSrc = menuImageDiv.querySelector('img').src;
-
-        let lightboxSrc = currentSrc;
-        if (fileId && currentSrc.includes(fileId)) {
-            lightboxSrc = directImgUrl;
-        }
+        // Get the current successful source from the image element
+        const imgEl = document.getElementById('dailyMenuImg');
+        const currentSrc = imgEl.src;
 
         const dailyMenuLightboxItem = {
-            src: lightboxSrc,
+            src: currentSrc,
             alt: "Denní menu",
             title: "Denní menu",
             desc: "Aktuální nabídka"
         };
 
         // ISOLATION: Set the active lightbox context to ONLY this item
-        // This ensures no navigation arrows appear and Main Menu data is preserved
         activeLightboxItems = [dailyMenuLightboxItem];
 
         openLightbox(0);
     });
 }
+
+// Global handler for image errors to try next candidate
+window.handleMenuImageError = function (img) {
+    const candidates = JSON.parse(img.getAttribute('data-candidates') || '[]');
+    let currentIndex = parseInt(img.getAttribute('data-current-index') || '0');
+
+    // Move to next candidate
+    currentIndex++;
+
+    if (currentIndex < candidates.length) {
+        console.warn(`Menu image load failed. Retrying with candidate ${currentIndex + 1}:`, candidates[currentIndex]);
+        img.setAttribute('data-current-index', currentIndex);
+        img.src = candidates[currentIndex];
+    } else {
+        console.error('All menu image candidates failed.');
+        // Ensure opacity is 1 so the fallback (already set in last step) is visible if it was a candidate, 
+        // or just leave broken symbol if even fallback failed.
+        img.style.opacity = '1';
+    }
+};
 
 function showNoMenuMessage() {
     const loader = document.getElementById('menuLoader');
