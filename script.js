@@ -709,3 +709,228 @@ function setCachedMenu(data) {
     }
 }
 
+
+// ===== Language Support =====
+const translations = {
+    cz: {
+        nav: {
+            home: "ÚVOD",
+            about: "O NÁS",
+            dailyMenu: "DENNÍ MENU",
+            menu: "MENU",
+            reservations: "REZERVACE"
+        },
+        hero: {
+            title: "Tradice v moderním hávu",
+            subtitle: "Objevte českou kuchyni, jakou jste ještě neznali",
+            description: "Spojujeme tradiční chutě s inovativní gastronomií a prvotřídními surovinami",
+            cta: "REZERVOVAT"
+        },
+        about: {
+            title: "Náš příběh",
+            block1Title: "Kde tradice potkává inovaci",
+            block1Text: "AŽ DO SYTA vznikla z lásky k české kuchyni a touhy ukázat její pravou tvář světu. Naše restaurace je oslavou chutí, které známe od dětství, ale prezentovaných způsobem, který překvapí i ty nejnáročnější gurmány.",
+            block2Title: "Naše filozofie",
+            block2Text: "Věříme, že tradiční česká kuchyně si zaslouží stejnou pozornost a respekt jako jakákoli jiná světová gastronomie. Proto každý pokrm připravujeme s maximální péčí, používáme pouze čerstvé lokální suroviny od ověřených dodavatelů a klasické recepty obohacujeme moderními technikami.",
+            block3Title: "Proč jsme tady",
+            block3Text: "Chceme změnit pohled na českou kuchyni. Svíčková, vepřo-knedlo-zelo nebo smažený sýr nejsou jen \"obyčejná\" jídla - v našich rukou se stávají gastronomickým zážitkem. Každé sousto vypráví příběh naší země, naší historie a našich babiček, ale v moderním a sofistikovaném podání."
+        },
+        dailyMenu: {
+            title: "Denní menu",
+            subtitle: "Čerstvé menu každý den • Aktualizováno denně",
+            loading: "Načítání menu...",
+            error: "Nepodařilo se načíst menu. Zkuste to prosím později.",
+            noMenuTitle: "Dnes není menu k dispozici",
+            noMenuText: "Omlouváme se, denní menu momentálně není dostupné. Podívejte se prosím na naše stálé menu níže.",
+            detail: "Zobrazit detail",
+            dateFormat: "cs-CZ"
+        },
+        menu: {
+            title: "Naše speciality",
+            subtitle: "Tradiční pokrmy v luxusním a moderním podání",
+            detail: "Zobrazit detail",
+            items: {
+                svickova: {
+                    title: "Svíčková na smetaně",
+                    desc: "Hovězí svíčková marinovaná 24 hodin, podávaná s jemnou smetanovou omáčkou z pečené zeleniny, domácími karlovarskými knedlíky a brusinkovým chutney"
+                },
+                vepro: {
+                    title: "Vepřo-knedlo-zelo Premium",
+                    desc: "Pomalu pečená vepřová panenka s křupavou kůrčičkou, fialové zelí s jablky a hřebíčkem, bramborové knedlíky s bylinkami"
+                },
+                syr: {
+                    title: "Smažený sýr Deluxe",
+                    desc: "Ementál v křupavé panádě s lanýžovou majonézou, rukolový salát s cherry rajčaty, domácí tatarská omáčka s kapary"
+                },
+                gulas: {
+                    title: "Hovězí guláš Signature",
+                    desc: "Hovězí líčka dušená 6 hodin v červeném víně s paprikou a kmínem, podáváno v litinové pánvičce s čerstvým chlebem a cibulkou"
+                },
+                trdelnik: {
+                    title: "Trdelník Reimagined",
+                    desc: "Domácí trdelník s vanilkovou zmrzlinou, karamelovou omáčkou, čerstvými lesními plody a zlatým listkem"
+                },
+                degustation: {
+                    title: "Degustační menu šéfkuchaře",
+                    desc: "Sedmichodové menu představující to nejlepší z naší kuchyně s párováním vín. Každý týden nové překvapení"
+                }
+            }
+        },
+        reservations: {
+            title: "Kontakt a Rezervace",
+            subtitle: "Těšíme se na vaši návštěvu. Pro rezervaci nám prosím zavolejte.",
+            call: "Zavolejte nám",
+            callAction: "Klikněte pro zavolání",
+            write: "Napište nám",
+            writeAction: "Klikněte pro zkopírování",
+            copied: "Zkopírováno!",
+            find: "Kde nás najdete",
+            hours: "Otevírací doba",
+            daysWeek: "Po - Pá:",
+            daysWeekend: "So - Ne:"
+        },
+        footer: {
+            desc: "Objevte českou kuchyni v moderním hávu",
+            nav: "Navigace",
+            contact: "Kontakt",
+            social: "Sledujte nás",
+            disclaimer: "Tato stránka je pouze ukázkový projekt / koncept a restaurace momentálně není v provozu.",
+            rights: "Všechna práva vyhrazena."
+        }
+    },
+    en: {
+        nav: {
+            home: "HOME",
+            about: "ABOUT",
+            dailyMenu: "DAILY MENU",
+            menu: "MENU",
+            reservations: "RESERVATIONS"
+        },
+        hero: {
+            title: "Tradition in Modern Guise",
+            subtitle: "Discover Czech cuisine like never before",
+            description: "We combine traditional flavors with innovative gastronomy and premium ingredients",
+            cta: "BOOK A TABLE"
+        },
+        about: {
+            title: "Our Story",
+            block1Title: "Where Tradition Meets Innovation",
+            block1Text: "AŽ DO SYTA was born from a love for Czech cuisine and a desire to show its true face to the world. Our restaurant is a celebration of flavors we've known since childhood, but presented in a way that surprises even the most demanding gourmets.",
+            block2Title: "Our Philosophy",
+            block2Text: "We believe traditional Czech cuisine deserves the same attention and respect as any other world gastronomy. That's why we prepare every dish with maximum care, using only fresh local ingredients from verified suppliers and enriching classic recipes with modern techniques.",
+            block3Title: "Why We Are Here",
+            block3Text: "We want to change the perspective on Czech cuisine. Sirloin in cream sauce, roast pork with dumplings and sauerkraut, or fried cheese aren't just \"ordinary\" meals - in our hands, they become a gastronomic experience. Every bite tells the story of our land, our history, and our grandmothers, but in a modern and sophisticated presentation."
+        },
+        dailyMenu: {
+            title: "Daily Menu",
+            subtitle: "Fresh menu every day • Updated daily",
+            loading: "Loading menu...",
+            error: "Failed to load menu. Please try again later.",
+            noMenuTitle: "No Menu Available Today",
+            noMenuText: "We apologize, the daily menu is currently unavailable. Please check our standard menu below.",
+            detail: "View Detail",
+            dateFormat: "en-US"
+        },
+        menu: {
+            title: "Our Specialties",
+            subtitle: "Traditional dishes in a luxurious and modern presentation",
+            detail: "View Detail",
+            items: {
+                svickova: {
+                    title: "Sirloin in Cream Sauce",
+                    desc: "Beef sirloin marinated for 24 hours, served with delicate cream sauce made from roasted vegetables, homemade Karlovy Vary dumplings, and cranberry chutney"
+                },
+                vepro: {
+                    title: "Roast Pork Premium",
+                    desc: "Slow-roasted pork tenderloin with crispy crust, red cabbage with apples and cloves, potato dumplings with herbs"
+                },
+                syr: {
+                    title: "Fried Cheese Deluxe",
+                    desc: "Emmental in crispy breadcrumbs with truffle mayonnaise, arugula salad with cherry tomatoes, homemade tartar sauce with capers"
+                },
+                gulas: {
+                    title: "Beef Goulash Signature",
+                    desc: "Beef cheeks braised for 6 hours in red wine with paprika and cumin, served in a cast iron skillet with fresh bread and onion"
+                },
+                trdelnik: {
+                    title: "Trdelník Reimagined",
+                    desc: "Homemade chimney cake with vanilla ice cream, caramel sauce, fresh forest berries, and gold leaf"
+                },
+                degustation: {
+                    title: "Chef's Tasting Menu",
+                    desc: "Seven-course menu presenting the best of our kitchen with wine pairing. A new surprise every week"
+                }
+            }
+        },
+        reservations: {
+            title: "Contact & Reservations",
+            subtitle: "We look forward to your visit. Please call us to make a reservation.",
+            call: "Call Us",
+            callAction: "Click to call",
+            write: "Write to Us",
+            writeAction: "Click to copy",
+            copied: "Copied!",
+            find: "Where to Find Us",
+            hours: "Opening Hours",
+            daysWeek: "Mon - Fri:",
+            daysWeekend: "Sat - Sun:"
+        },
+        footer: {
+            desc: "Discover Czech cuisine in a modern guise",
+            nav: "Navigation",
+            contact: "Contact",
+            social: "Follow Us",
+            disclaimer: "This page is only a sample project / concept and the restaurant is currently not in operation.",
+            rights: "All rights reserved."
+        }
+    }
+};
+
+let currentLang = localStorage.getItem('lang') || 'cz';
+
+function setLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem('lang', lang);
+
+    // Update html lang attribute
+    document.documentElement.lang = lang === 'cz' ? 'cs' : 'en';
+
+    // Update Language Toggle UI
+    const langToggle = document.getElementById('langToggle');
+    if (langToggle) {
+        langToggle.textContent = lang === 'cz' ? 'EN' : 'CZ'; // Show opposite language as action
+        langToggle.setAttribute('aria-label', lang === 'cz' ? 'Switch to English' : 'Přepnout do češtiny');
+    }
+
+    // Update all translatable elements
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const keys = el.getAttribute('data-i18n').split('.');
+        let value = translations[lang];
+        keys.forEach(key => {
+            if (value) value = value[key];
+        });
+
+        if (value) {
+            // Check if element has placeholder
+            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                el.placeholder = value;
+            } else {
+                el.innerText = value;
+            }
+        }
+    });
+}
+
+
+// Add Language Toggle Listener
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Language
+    setLanguage(currentLang);
+});
+
+// Expose toggle function globally for the HTML onclick
+window.toggleLanguage = function () {
+    console.log("Toggle Language Called. Current:", currentLang);
+    const newLang = currentLang === 'cz' ? 'en' : 'cz';
+    setLanguage(newLang);
+};
