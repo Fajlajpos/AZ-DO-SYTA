@@ -361,7 +361,7 @@ const DAILY_MENU_CONFIG = {
 
     // Cache settings
     cacheKey: 'dailyMenu_cache_v2', // Changed key to force refresh
-    cacheDuration: 1 * 60 * 60 * 1000, // 1 hour (more frequent updates for image)
+    cacheDuration: 5 * 60 * 1000, // 5 minutes (faster updates for new images)
 
     // Timeout for API calls
     fetchTimeout: 10000 // 10 seconds

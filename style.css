@@ -940,6 +940,8 @@ a {
 
 .menu-info {
     padding: 2rem;
+    display: flex;
+    flex-direction: column;
 }
 
 .menu-info h3 {
@@ -964,6 +966,7 @@ a {
     font-size: 1.4rem;
     font-weight: 700;
     color: var(--accent-gold);
+    margin-top: auto;
 }
 
 /* ===== Reservation Section ===== */
