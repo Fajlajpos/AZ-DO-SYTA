@@ -863,7 +863,7 @@ const translations = {
             }
         },
         reservations: {
-            title: "Contact & Reservations",
+            title: "Contact and Reservations",
             subtitle: "We look forward to your visit. Please call us to make a reservation.",
             call: "Call Us",
             callAction: "Click to call",
