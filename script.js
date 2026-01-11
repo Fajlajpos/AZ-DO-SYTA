@@ -37,6 +37,7 @@ document.querySelectorAll('.nav-link').forEach(link => {
 
             // Close mobile menu if open
             document.getElementById('navMenu')?.classList.remove('active');
+            document.getElementById('mobileToggle')?.classList.remove('active');
         }
     });
 });
@@ -67,6 +68,7 @@ const navMenu = document.getElementById('navMenu');
 
 mobileToggle?.addEventListener('click', () => {
     navMenu?.classList.toggle('active');
+    mobileToggle.classList.toggle('active');
 });
 
 // ===== Scroll Animations (Reveal on Scroll) =====
