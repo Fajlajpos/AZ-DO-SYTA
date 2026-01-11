@@ -1140,7 +1140,7 @@ a {
 
 .contact-card:hover .icon-wrapper svg {
     animation: wiggle 0.6s ease-in-out;
-    color: var(--accent-gold);
+    color: #000000;
     /* Highlight color */
 }
 
