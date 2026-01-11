@@ -1499,6 +1499,32 @@ a {
 
 /* Tablet and smaller desktops */
 @media (max-width: 968px) {
+
+    /* Hide hover effects on touch devices */
+    .menu-item:hover .menu-overlay,
+    .menu-item .menu-overlay {
+        opacity: 0 !important;
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    .menu-item:hover {
+        transform: none !important;
+        box-shadow: none !important;
+    }
+}
+
+/* Specific fix for devices that report standard width but have no hover (some tablets/hybrids) */
+@media (hover: none) {
+    .menu-item:hover .menu-overlay {
+        display: none !important;
+    }
+
+    .menu-item:hover {
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
     .nav-menu {
         position: fixed;
         top: 80px;
@@ -1631,6 +1657,11 @@ a {
 
 /* Mobile portrait */
 @media (max-width: 640px) {
+    html {
+        font-size: 85%;
+        /* Scales down everything (1rem = ~13.6px) */
+    }
+
     .container {
         padding: 2.5rem 1.5rem;
     }
