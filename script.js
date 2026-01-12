@@ -173,7 +173,7 @@ window.addEventListener('scroll', () => {
 
 // ===== Email Copy Functionality =====
 function copyEmail() {
-    const email = document.getElementById('contactEmail').innerText;
+    const email = document.getElementById('contactEmail').textContent;
     const tooltip = document.getElementById('copyTooltip');
 
     navigator.clipboard.writeText(email).then(() => {
@@ -248,8 +248,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     menuItems.forEach((item, index) => {
         const img = item.querySelector('img');
-        const title = item.querySelector('.menu-info h3').innerText;
-        const desc = item.querySelector('.menu-info p').innerText;
+        const title = item.querySelector('.menu-info h3').textContent;
+        const desc = item.querySelector('.menu-info p').textContent;
 
         mainMenuItemsData.push({
             src: img.src,
@@ -287,8 +287,8 @@ function updateLightboxContent() {
     const data = activeLightboxItems[currentImageIndex];
     lightboxImage.src = data.src;
     lightboxImage.alt = data.alt;
-    lightboxTitle.innerText = data.title;
-    lightboxDesc.innerText = data.desc;
+    lightboxTitle.textContent = data.title;
+    lightboxDesc.textContent = data.desc;
 
     // Toggle navigation arrows based on item count in CURRENT active set
     if (activeLightboxItems.length <= 1) {

@@ -57,6 +57,13 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Performance Optimization: Content Visibility */
+section:not(.hero-section) {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 1000px;
+    /* Estimate section height to prevent scrollbar jumping */
+}
+
 img {
     max-width: 100%;
     height: auto;
@@ -373,6 +380,7 @@ a {
     font-size: 1.1rem;
     border-radius: 50px;
     transition: var(--transition);
+    will-change: transform, box-shadow;
     box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
     letter-spacing: 1px;
 }
@@ -548,6 +556,8 @@ a {
     overflow: hidden;
     /* Fix for hover edge sharpness */
     transform: translateZ(0);
+    will-change: transform, box-shadow;
+    /* Optimize hover effect */
     /* Hardware acceleration fix for radius */
     margin: 10px;
     /* prevent shadow clipping */
@@ -1541,7 +1551,11 @@ a {
         gap: 2.5rem;
         z-index: 1001;
         /* Above navbar (1000) to cover screen fully */
+        z-index: 1001;
+        /* Above navbar (1000) to cover screen fully */
         transition: opacity 0.4s ease, visibility 0.4s ease;
+        will-change: opacity, visibility;
+        /* Optimizes fade animation */
         opacity: 0;
         visibility: hidden;
         pointer-events: none;
