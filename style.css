@@ -57,12 +57,10 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Performance Optimization: Content Visibility */
-section:not(.hero-section) {
-    content-visibility: auto;
-    contain-intrinsic-size: 1px 1000px;
-    /* Estimate section height to prevent scrollbar jumping */
-}
+/* Performance Optimization: Content Visibility REMOVED due to issues with Daily Menu */
+/* 
+   Optimization removed to ensure reliability of dynamic content 
+*/
 
 img {
     max-width: 100%;

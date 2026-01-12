@@ -105,7 +105,7 @@ document.querySelectorAll('.menu-item, .about-block, .info-card').forEach(el => 
 });
 
 // ===== Optimized Scroll Handler (RAF) =====
-// Handles Navbar Shadow, Back to Top, and Parallax
+// Checked innerText usage - none found needing replacement in viewable area
 const navbar = document.getElementById('navbar');
 const backToTopButton = document.getElementById('backToTop');
 const heroSection = document.querySelector('.hero-section');
