@@ -36,8 +36,11 @@ document.querySelectorAll('.nav-link').forEach(link => {
             }, 1000);
 
             // Close mobile menu if open
-            document.getElementById('navMenu')?.classList.remove('active');
-            document.getElementById('mobileToggle')?.classList.remove('active');
+            if (document.getElementById('navMenu')?.classList.contains('active')) {
+                document.getElementById('navMenu').classList.remove('active');
+                document.getElementById('mobileToggle')?.classList.remove('active');
+                document.body.style.overflow = ''; // Restore scrolling
+            }
         }
     });
 });
@@ -69,6 +72,13 @@ const navMenu = document.getElementById('navMenu');
 mobileToggle?.addEventListener('click', () => {
     navMenu?.classList.toggle('active');
     mobileToggle.classList.toggle('active');
+
+    // Toggle body scroll lock
+    if (navMenu?.classList.contains('active')) {
+        document.body.style.overflow = 'hidden';
+    } else {
+        document.body.style.overflow = '';
+    }
 });
 
 // ===== Scroll Animations (Reveal on Scroll) =====
