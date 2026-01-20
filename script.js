@@ -372,7 +372,7 @@ const DAILY_MENU_CONFIG = {
     useDemoData: false,
 
     // Cache settings
-    cacheKey: 'dailyMenu_cache_v2', // Changed key to force refresh
+    cacheKey: 'dailyMenu_cache_v3', // Changed key to force refresh
     cacheDuration: 5 * 60 * 1000, // 5 minutes (faster updates for new images)
 
     // Timeout for API calls
@@ -397,67 +397,93 @@ async function initDailyMenu() {
     const loader = document.getElementById('menuLoader');
     const content = document.getElementById('menuContent');
 
-    // OPTIMISTIC UI: Render default menu immediately
-    // This guarantees the user sees the menu instantly without errors
-    if (content) {
-        console.log('Rendering optimistic default menu...');
-        renderDailyMenu([{ imageUrl: DEFAULT_MENU_IMAGE }]);
+    // 1. Try to get cached data first (Fastest)
+    const cachedData = getCachedMenu();
 
+    if (cachedData) {
+        console.log('Rendering cached menu...');
+        renderDailyMenu(cachedData);
         if (loader) loader.style.display = 'none';
         content.style.display = 'grid';
     }
 
-    // Still try to fetch fresh data in background to update if changed
+    // 2. Always fetch fresh data in background to update
     await fetchDailyMenu(true);
 }
 
+// Helper to show debug errors on screen because user is frustrated
+function showDebugError(msg, detail) {
+    const content = document.getElementById('menuContent');
+    // Don't overwrite if there is already content, just append error
+    const errDiv = document.createElement('div');
+    errDiv.style.color = 'red';
+    errDiv.style.background = '#ffe6e6';
+    errDiv.style.padding = '10px';
+    errDiv.style.margin = '10px';
+    errDiv.style.border = '1px solid red';
+    errDiv.style.fontSize = '12px';
+    errDiv.innerHTML = `<strong>CHYBA (ukáž tohle podpoře):</strong> ${msg}<br><small>${detail || ''}</small>`;
+
+    // If content is empty/hidden, show it
+    content.style.display = 'block';
+    content.appendChild(errDiv);
+    console.error(msg, detail);
+}
+
+// ... existing render code ...
 async function fetchDailyMenu(isBackgroundUpdate = false) {
     // Note: Loader is skipped because we use Optimistic UI in initDailyMenu
-
 
     try {
         // Fetch CSV data
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), DAILY_MENU_CONFIG.fetchTimeout);
 
+        // Add timestamp to prevent browser caching of the CSV file itself
+        const timestamp = Date.now();
+        const urlWithCacheBuster = DAILY_MENU_CONFIG.csvUrl + (DAILY_MENU_CONFIG.csvUrl.includes('?') ? '&' : '?') + `t=${timestamp}`;
+
         let csvText = null;
 
         try {
             // Attempt 1: Direct fetch (works if CORS is enabled on Sheet)
-            const response = await fetch(DAILY_MENU_CONFIG.csvUrl, { signal: controller.signal });
+            const response = await fetch(urlWithCacheBuster, { signal: controller.signal });
             if (response.ok) {
                 csvText = await response.text();
             } else {
-                throw new Error('Direct fetch failed');
+                throw new Error(`Direct fetch failed: ${response.status}`);
             }
         } catch (directError) {
             console.warn('Direct fetch failed, trying proxy...', directError);
 
             try {
                 // Attempt 2: CORS Proxy (corsproxy.io is often more reliable for raw data)
-                const proxyUrl = `https://corsproxy.io/?` + encodeURIComponent(DAILY_MENU_CONFIG.csvUrl);
+                // Also add cache buster to proxy url
+                const proxyUrl = `https://corsproxy.io/?` + encodeURIComponent(urlWithCacheBuster);
                 const response = await fetch(proxyUrl, { signal: controller.signal });
                 if (response.ok) {
                     csvText = await response.text();
                 } else {
-                    throw new Error('Proxy fetch failed');
+                    throw new Error(`Proxy fetch failed: ${response.status}`);
                 }
             } catch (proxyError) {
                 console.warn('Proxy fetch failed:', proxyError);
+                // IF BOTH FAIL, SHOW DEBUG ERROR
+                if (!isBackgroundUpdate) showDebugError('Nepodařilo se stáhnout tabulku (CSV).', proxyError.message);
             }
         }
 
+        // ... rest of function ...
+
         clearTimeout(timeoutId);
 
-        // Fallback: Use hardcoded latest known ID if all fetches fail
-        // This ensures the site works NOW, even if dynamic fetching is flaky
-        if (!csvText || (!csvText.includes('drive.google.com') && !csvText.includes('driveusercontent'))) {
-            console.warn('All fetches failed or returned invalid data. Using fallback.');
-            // This ID was retrieved during analysis and is likely the current menu
-            csvText = 'https://drive.google.com/file/d/11qWXcAjxPkHNtBFa1Yqy-ZAqymnlXT-Q/view?usp=sharing';
+        // Fallback: If fetch failed, use a KNOWN GOOD default for now (the one we verified exists in CSV)
+        // But better is to just let it fail gracefully or show nothing if we can't get data.
+        if (!csvText) {
+            console.warn('All fetches failed. No data to parse.');
+        } else {
+            console.log('✅ CSV loaded, length:', csvText.length);
         }
-
-        console.log('✅ CSV/Fallback loaded, length:', csvText.length);
 
         // Parse CSV data
         const menuData = parseCSVData(csvText);
@@ -465,15 +491,9 @@ async function fetchDailyMenu(isBackgroundUpdate = false) {
 
         if (menuData.length === 0) {
             console.warn('No menu data found after parsing');
-            showNoMenuMessage();
-            return;
-        }
-
-        // Cache the data
-        setCachedMenu(menuData);
-
-        if (menuData.length === 0) {
-            console.warn('No menu data found after parsing');
+            if (!getCachedMenu()) {
+                showNoMenuMessage();
+            }
             return;
         }
 
@@ -486,7 +506,6 @@ async function fetchDailyMenu(isBackgroundUpdate = false) {
 
     } catch (err) {
         console.error('Error in background update:', err);
-        // We do NOT show an error message because we already have the optimistic default shown.
     }
 }
 
@@ -494,19 +513,31 @@ function parseCSVData(csvText) {
     const menuData = [];
 
     try {
-        // Look for Google Drive link in the text
-        // Matches: https://drive.google.com/file/d/[ID] OR https://drive.google.com/open?id=[ID] etc.
-        const driveLinkRegex = /drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=)([a-zA-Z0-9_-]+)/;
-        const match = csvText.match(driveLinkRegex);
+        if (!csvText) return [];
 
-        if (match && match[1]) {
-            const fileId = match[1];
-            // Convert to direct view link
-            const directLink = `https://drive.google.com/uc?export=view&id=${fileId}`;
+        // Simple approach: Split by newlines and find lines with google drive links
+        const lines = csvText.split(/\r?\n/);
+        let foundLink = null;
+        let original = null;
 
+        for (const line of lines) {
+            // Check for drive link signature
+            if (line.includes('drive.google.com') && (line.includes('/file/d/') || line.includes('id='))) {
+
+                // Extract ID using a simpler regex that works on the line
+                const idMatch = line.match(/(?:file\/d\/|id=)([a-zA-Z0-9_-]+)/);
+                if (idMatch && idMatch[1]) {
+                    foundLink = `https://drive.google.com/uc?export=view&id=${idMatch[1]}`;
+                    original = line;
+                }
+            }
+        }
+
+        // If we found a link (it will be the last one because we looped through all), use it
+        if (foundLink) {
             menuData.push({
-                imageUrl: directLink,
-                originalUrl: match[0]
+                imageUrl: foundLink,
+                originalUrl: original
             });
         }
 
@@ -536,52 +567,39 @@ function renderDailyMenu(menuData) {
     let fileId = null;
     let candidateUrls = [];
 
-    // Fallback image (use a nice existing dish as placeholder if drive fully fails)
-    const fallbackImgUrl = 'images/svickova_dish_1765053566812.png';
-
     if (idMatch && idMatch[1]) {
         fileId = idMatch[1];
-        // STRATEGY: Try multiple Google Drive endpoints in order of reliability/speed
+        // STRATEGY: Try multiple Google Drive endpoints
+        // lh3 is often most reliable for direct hotlinking
         candidateUrls = [
-            `https://drive.google.com/thumbnail?id=${fileId}&sz=w2000`,      // Option 1: Thumbnail API (Fastest)
-            `https://lh3.googleusercontent.com/d/${fileId}=s2000`,           // Option 2: LH3 Direct (Very reliable)
-            `https://drive.google.com/uc?export=view&id=${fileId}`,          // Option 3: Standard Export (Can be rate limited)
-            fallbackImgUrl                                                   // Option 4: Local Fallback
+            `https://lh3.googleusercontent.com/d/${fileId}=s2000`,           // Option 1: LH3 Direct (Best for hotlinking)
+            `https://drive.google.com/thumbnail?id=${fileId}&sz=w2000`,      // Option 2: Thumbnail API
+            `https://drive.google.com/uc?export=view&id=${fileId}`           // Option 3: Standard Export
         ];
     } else {
-        // If we can't parse ID, just use the raw URL provided and then fallback
-        candidateUrls = [item.imageUrl, fallbackImgUrl];
+        candidateUrls = [item.imageUrl];
     }
 
-    // Create the container with .menu-item class to inherit all standard styles
-    // We add a specific style (max-width) to keep it reasonable for a single item
+    // Create the container with .menu-item class
     const card = document.createElement('div');
     card.className = 'menu-item';
-
-    // Allow width to fit content up to a max, but let height be natural
     card.style.maxWidth = '380px';
     card.style.width = '100%';
-    card.style.margin = '0'; // Flexbox handles centering
+    card.style.margin = '0';
 
-    // FORCE VISIBILITY: Overwrite any potential reveal animation styles
     card.style.opacity = '1';
     card.style.transform = 'translateY(0)';
     card.style.display = 'block';
 
-    // Get today's date for the badge
     const today = new Date();
     const dateOptions = { weekday: 'long', day: 'numeric', month: 'long' };
     let dateStr = today.toLocaleDateString('cs-CZ', dateOptions);
-    dateStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1); // Capitalize
+    dateStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
 
-    // We start with the first candidate
     const initialSrc = candidateUrls[0];
 
     const cardHTML = `
-        <!-- Override fixed height of .menu-image to allow natural image height -->
         <div class="menu-image" style="height: auto !important; min-height: auto !important; aspect-ratio: auto !important; padding-bottom: 0; position: relative;">
-            
-            <!-- Date Badge -->
             <div style="position: absolute; top: 15px; right: 15px; background: rgba(255, 255, 255, 0.95); padding: 6px 14px; border-radius: 30px; font-weight: 600; color: #8B1538; box-shadow: 0 4px 15px rgba(0,0,0,0.15); z-index: 5; font-size: 0.85rem; letter-spacing: 0.5px; backdrop-filter: blur(4px);">
                 ${dateStr}
             </div>
@@ -592,6 +610,7 @@ function renderDailyMenu(menuData) {
                 data-candidates='${JSON.stringify(candidateUrls)}'
                 data-current-index="0"
                 alt="Denní menu" 
+                referrerpolicy="no-referrer"
                 onload="this.style.opacity=1" 
                 onerror="handleMenuImageError(this)"
                 style="width: 100%; height: auto; display: block; object-fit: contain; min-height: 200px; background: #f0f0f0;"
@@ -600,29 +619,27 @@ function renderDailyMenu(menuData) {
                 <span class="view-detail">Zobrazit detail</span>
             </div>
         </div>
-        <!-- We omit the text section intentionally as the daily menu information is inside the image -->
     `;
 
     card.innerHTML = cardHTML;
     content.appendChild(card);
 
-    // Add Lightbox Click Event - EXACTLY matching standard behavior but ISOLATED
+    // Ensure loader is hidden when we render content
+    const loader = document.getElementById('menuLoader');
+    if (loader) loader.style.display = 'none';
+    content.style.display = 'grid';
+
+    // ... click handler logic ...
     const menuImageDiv = card.querySelector('.menu-image');
     menuImageDiv.addEventListener('click', () => {
-        // Get the current successful source from the image element
         const imgEl = document.getElementById('dailyMenuImg');
         const currentSrc = imgEl.src;
-
-        const dailyMenuLightboxItem = {
+        activeLightboxItems = [{
             src: currentSrc,
             alt: "Denní menu",
             title: "Denní menu",
             desc: "Aktuální nabídka"
-        };
-
-        // ISOLATION: Set the active lightbox context to ONLY this item
-        activeLightboxItems = [dailyMenuLightboxItem];
-
+        }];
         openLightbox(0);
     });
 }
@@ -632,18 +649,20 @@ window.handleMenuImageError = function (img) {
     const candidates = JSON.parse(img.getAttribute('data-candidates') || '[]');
     let currentIndex = parseInt(img.getAttribute('data-current-index') || '0');
 
+    console.warn(`Menu image failed (Candidate ${currentIndex + 1}/${candidates.length}):`, candidates[currentIndex]);
+
     // Move to next candidate
     currentIndex++;
 
     if (currentIndex < candidates.length) {
-        console.warn(`Menu image load failed. Retrying with candidate ${currentIndex + 1}:`, candidates[currentIndex]);
+        console.log(`Retrying with candidate ${currentIndex + 1}:`, candidates[currentIndex]);
         img.setAttribute('data-current-index', currentIndex);
         img.src = candidates[currentIndex];
     } else {
         console.error('All menu image candidates failed.');
-        // Ensure opacity is 1 so the fallback (already set in last step) is visible if it was a candidate, 
-        // or just leave broken symbol if even fallback failed.
         img.style.opacity = '1';
+        // Show debug error on screen
+        showDebugError('Nepodařilo se načíst obrázek z Google Drive.', 'Zkontrolujte, zda je soubor "Veřejný" (Anyone with the link). Zkuste ho otevřít v anonymním okně.');
     }
 };
 
