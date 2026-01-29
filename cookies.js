@@ -8,6 +8,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const acceptBtn = document.getElementById('cookie-accept');
     const necessaryBtn = document.getElementById('cookie-necessary');
 
+    // DEBUG: Check for reset param to clear user choice
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('reset-cookies')) {
+        localStorage.removeItem('cookie_consent');
+        console.log('Cookies: Consent reset via URL parameter');
+        // Clean URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     // Check if user has already made a choice
     if (!localStorage.getItem('cookie_consent')) {
         // Show banner with a slight delay for better UX
@@ -35,6 +44,17 @@ document.addEventListener('DOMContentLoaded', () => {
         // Do NOT enable analytics
     });
 });
+
+/**
+ * Re-open cookie settings
+ * Called from footer link
+ */
+function showCookieBanner() {
+    const cookieBanner = document.getElementById('cookie-banner');
+    if (cookieBanner) {
+        cookieBanner.classList.add('visible');
+    }
+}
 
 /**
  * Enable marketing/analytics scripts

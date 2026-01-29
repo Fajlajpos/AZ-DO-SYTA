@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="cs">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Ochrana osobních údajů - AŽ DO SYTA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=54">
+    <script src="cookies.js"></script>
+    <style>
+        /* Internal styles for specific document layout, reusing global variables */
+
+        body {
+            background-color: var(--bg-cream);
+            color: var(--text-dark);
+        }
+
+        /* Hero Header for Legal Page - CLEAN VERSION WITHOUT IMAGE */
+        .legal-hero {
+            position: relative;
+            background-color: var(--bg-cream);
+            /* Match body background */
+            padding: 140px 0 60px;
+            color: var(--text-dark);
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] .legal-hero {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .legal-hero h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+            color: var(--primary-burgundy);
+        }
+
+        .legal-hero p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        /* Content Container */
+        .legal-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 2rem 5rem;
+        }
+
+        .back-link-wrapper {
+            margin-bottom: 2rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-burgundy);
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+
+        .back-link:hover {
+            color: var(--accent-gold);
+            transform: translateX(-5px);
+        }
+
+        /* Content Cards w/ better dark mode support */
+        .legal-section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid var(--accent-gold);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        [data-theme="dark"] .legal-section {
+            background: #252525;
+            /* Dark background for cards */
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-left: 4px solid var(--accent-gold);
+        }
+
+        .legal-section h2 {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            color: var(--primary-burgundy);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        [data-theme="dark"] .legal-section h2 {
+            color: var(--accent-gold);
+            /* Contrast for dark mode header */
+        }
+
+        .legal-section p {
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        [data-theme="dark"] .legal-section p {
+            color: #d0d0d0;
+            /* Better text contrast */
+        }
+
+        /* Lists */
+        .legal-list {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0;
+        }
+
+        .legal-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.8rem;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        [data-theme="dark"] .legal-list li {
+            color: #d0d0d0;
+        }
+
+        .legal-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--primary-burgundy);
+            font-weight: bold;
+            font-size: 1.2rem;
+            line-height: 1.4;
+        }
+
+        [data-theme="dark"] .legal-list li::before {
+            color: var(--accent-gold);
+        }
+
+        /* Company Info Box */
+        .company-box {
+            background: rgba(139, 21, 56, 0.05);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(139, 21, 56, 0.1);
+        }
+
+        [data-theme="dark"] .company-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .company-box strong {
+            color: var(--primary-burgundy);
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        [data-theme="dark"] .company-box strong {
+            color: var(--accent-gold);
+        }
+
+        .company-box a {
+            color: var(--text-dark);
+            text-decoration: underline;
+        }
+
+        [data-theme="dark"] .company-box a {
+            color: var(--text-light);
+        }
+
+        /* Cookie Settings Link */
+        .settings-trigger {
+            color: var(--primary-burgundy);
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .settings-trigger:hover {
+            color: var(--accent-gold);
+        }
+
+        .last-update {
+            text-align: center;
+            color: #888;
+            margin-top: 3rem;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Reuse Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo-link">
+                <div class="logo">
+                    <span class="logo-main">AŽ DO SYTA</span>
+                    <span class="logo-tagline">Tradiční chutě • Moderní styl</span>
+                </div>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Zpět na hlavní stranu</a></li>
+                <!-- Theme Toggle (Hidden visually but functional via script check) -->
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="legal-hero">
+        <div class="container">
+            <h1>Zásady ochrany osobních údajů</h1>
+            <p>Informace o tom, jak zpracováváme vaše data a jaká máte práva dle GDPR</p>
+        </div>
+    </header>
+
+    <div class="legal-container">
+        <div class="back-link-wrapper">
+            <a href="index.html" class="back-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                Zpět na web
+            </a>
+        </div>
+
+        <section class="legal-section">
+            <h2>1. Správce osobních údajů</h2>
+            <p>Správcem vašich osobních údajů je provozovatel restaurace AŽ DO SYTA:</p>
+            <div class="company-box">
+                <strong>AŽ DO SYTA s.r.o. (fiktivní)</strong>
+                IČO: 12345678<br>
+                Sídlo: Dlouhá 123, 110 00 Praha 1<br>
+                Email: <a href="mailto:info@azdosyta.cz">info@azdosyta.cz</a>
+            </div>
+        </section>
+
+        <section class="legal-section">
+            <h2>2. Jaké údaje zpracováváme</h2>
+            <p>Zpracováváme pouze údaje nezbytné pro provoz webu a poskytování našich služeb:</p>
+            <ul class="legal-list">
+                <li><strong>Technické cookies:</strong> Nezbytné pro správné zobrazení stránky a její funkce. Bez těchto
+                    cookies by web nefungoval správně.</li>
+                <li><strong>Analytické cookies (volitelné):</strong> Anonymizované statistiky návštěvnosti (např. Google
+                    Analytics), které nám pomáhají zlepšovat web. Tyto cookies použijeme pouze pokud nám udělíte
+                    souhlas.</li>
+                <li><strong>Kontaktní údaje:</strong> Pokud nás kontaktujete emailem nebo telefonicky, zpracováváme vaše
+                    údaje (jméno, email, telefon) výhradně za účelem vyřízení vašeho dotazu či rezervace.</li>
+            </ul>
+        </section>
+
+        <section class="legal-section">
+            <h2>3. Účel a právní základ</h2>
+            <p>Vaše údaje zpracováváme na základě následujících právních titulů:</p>
+            <ul class="legal-list">
+                <li><strong>Oprávněný zájem:</strong> Pro zajištění technického chodu webových stránek a vyřizování
+                    běžné komunikace se zákazníky.</li>
+                <li><strong>Souhlas:</strong> Pro marketingové a analytické cookies. Tento souhlas je zcela dobrovolný a
+                    můžete jej kdykoliv odvolat.</li>
+            </ul>
+        </section>
+
+        <section class="legal-section">
+            <h2>4. Vaše práva</h2>
+            <p>V souladu s nařízením GDPR máte vůči nám naledující práva:</p>
+            <ul class="legal-list">
+                <li>Právo na přístup k vašim osobním údajům.</li>
+                <li>Právo na opravu nepřesných údajů.</li>
+                <li>Právo na výmaz ("právo být zapomenut"), pokud pominul důvod zpracování.</li>
+                <li>Právo vznést námitku proti zpracování na základě oprávněného zájmu.</li>
+                <li>Právo kdykoliv odvolat souhlas se zpracováním osobních údajů.</li>
+            </ul>
+        </section>
+
+        <section class="legal-section">
+            <h2>5. Nastavení cookies</h2>
+            <p>Tento web používá soubory cookies. Vaše preference můžete kdykoliv změnit. Pokud jste svůj souhlas
+                udělili a chcete jej vzít zpět, nebo naopak, využijte tlačítko níže.</p>
+            <p>
+                <a onclick="showCookieBanner(); return false;" class="settings-trigger">Otevřít nastavení cookies</a>
+            </p>
+        </section>
+
+        <p class="last-update">Poslední aktualizace: 29. ledna 2026</p>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p class="copyright">&copy; 2025 AŽ DO SYTA. Všechna práva vyhrazena.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cookie Banner (Hidden initially) -->
+    <div id="cookie-banner" class="cookie-banner">
+        <div class="cookie-content">
+            <h3 data-i18n="cookies.title">Nastavení souborů cookies</h3>
+            <p data-i18n="cookies.text">
+                Používáme soubory cookies, abychom vám zajistili co nejlepší zážitek z našich webových stránek.
+                Kliknutím na "Přijmout vše" souhlasíte s používáním všech typů cookies.
+                <a href="ochrana-osobnich-udaju.html" class="cookie-link">Více informací</a>
+            </p>
+        </div>
+        <div class="cookie-actions">
+            <button id="cookie-necessary" class="cookie-btn necessary">Jen nezbytné</button>
+            <button id="cookie-accept" class="cookie-btn accept">Přijmout vše</button>
+        </div>
+    </div>
+
+    <!-- Main Script needs to be included for Theme handling -->
+    <script src="script.js?v=40"></script>
+</body>
+
+</html>
